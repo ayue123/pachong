@@ -34,9 +34,7 @@ public class GetId {
                         //                                int i = Integer.parseInt(s);
                         //                                out.write(s + "\n");
                         //                        } catch (Exception e) {
-                        //                                if (s.contains("$")) {
-                        //                                        out.write(s + "\n");
-                        //                                }
+                        //
                         //                        }
                         //去重
                         iii.add(Integer.parseInt(s));
@@ -48,5 +46,7 @@ public class GetId {
                 if (out.checkError()) {
                         System.out.println("日志重建异常！data:" + out);
                 }
+                br.close();
+                out.close();
         }
 }

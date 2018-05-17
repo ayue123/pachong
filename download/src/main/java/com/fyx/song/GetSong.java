@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatums;
+import cn.edu.hfut.dmic.webcollector.model.Links;
 import cn.edu.hfut.dmic.webcollector.model.Page;
 import cn.edu.hfut.dmic.webcollector.plugin.berkeley.BreadthCrawler;
 import cn.edu.hfut.dmic.webcollector.util.FileUtils;
@@ -24,6 +25,7 @@ import cn.edu.hfut.dmic.webcollector.util.FileUtils;
 public class GetSong extends BreadthCrawler {
         File downloadDir;
         static Set<Integer> songIdList = new HashSet<Integer>();
+        static Set<String> songUrlList = new HashSet<String>();
 
         /*用一个整数，不断自增，来作为下载的图片的文件名*/
         AtomicInteger id = new AtomicInteger(0);
@@ -46,7 +48,7 @@ public class GetSong extends BreadthCrawler {
                 /*将歌曲内容保存到文件，page.getContent()获取的是文件的byte数组*/
                 if (page.getContent().length > 1000000) {
                         try {
-                                FileUtils.writeFileWithParent("download/" + id.incrementAndGet() + ".mp4", page.getContent());
+                                FileUtils.writeFileWithParent("qqdownload/" + "qwq" + id.incrementAndGet() + ".mp3", page.getContent());
                                 System.out.println("download:" + page.getUrl());
                         } catch (IOException e) {
                                 e.printStackTrace();
@@ -54,11 +56,49 @@ public class GetSong extends BreadthCrawler {
                 }
         }
 
+        //通过歌单获取歌曲id（网易云音乐）
         private void getSongIdList() throws IOException {
-                BufferedReader br = new BufferedReader(new FileReader("D:\\log\\song.txt"));
+                //歌单复制的html文件路径
+                BufferedReader br = new BufferedReader(new FileReader("D:\\log\\html.txt"));
+                //                PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("D:\\log\\wangyiSongUrl.txt")));
+                String s;
+                String ss;
+                String sss = null;
+                //将id附近的字符串替换为*
+                String a = "href\\=\"\\/song\\?id\\=";
+                String b = "\\*";
+                String c = "\"\\>\\<b title\\=";
+                while ((s = br.readLine()) != null) {
+                        ss = s.replaceAll(a, b);
+                        sss = ss.replaceAll(c, b);
+                }
+                //按*截取
+                String[] outResult = sss.split("\\*");
+                for (int i = 0; i < outResult.length; i++) {
+                        try {
+                                //将id添加到idList中
+                                int id = Integer.parseInt(outResult[i]);
+                                songIdList.add(id);
+                        } catch (Exception e) {
+
+                        }
+                }
+                //拼接url
+                //                for (int songId : songIdList) {
+                //                        String songUrl = "http://music.163.com/song/media/outer/url?id=" + songId + ".mp3";
+                //                        out.write(songUrl + "\n");
+                //                }
+                br.close();
+                //                out.close();
+        }
+
+        //获取歌曲Url（所有音乐）
+        private void getSongUrl() throws IOException {
+                //歌曲url的路径
+                BufferedReader br = new BufferedReader(new FileReader("D:\\log\\qqSongUrl.txt"));
                 String s;
                 while ((s = br.readLine()) != null) {
-                        songIdList.add(Integer.parseInt(s));
+                        songUrlList.add(s);
                 }
 
         }
@@ -66,16 +106,22 @@ public class GetSong extends BreadthCrawler {
         public static void main(String[] args) throws Exception {
                 GetSong crawler = new GetSong("crawl", "download3");
                 //                crawler.getSongIdList();
-                //                Links link = new Links();
+                crawler.getSongUrl();
+                Links link = new Links();
+                //获取歌曲Url
+                for (String songUrl : songUrlList) {
+                        link.add(songUrl);
+                }
+                //通过歌单歌曲id拼接为url
                 //                for (int songId : songIdList) {
+                //                        //拼接下载路径
                 //                        String songUrl = "http://music.163.com/song/media/outer/url?id=" + songId + ".mp3";
                 //                        link.add(songUrl);
                 //                }
-                //                crawler.addSeed(link);
-                crawler.addSeed("https://live.bilibili.com/5636118?spm_id_from=333.334.bili_live.5");
+                crawler.addSeed(link);
                 crawler.setThreads(9);
                 crawler.setResumable(false);
-                crawler.start(10);
+                crawler.start(2);
         }
 
 }
