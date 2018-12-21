@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Implementation-Title: otalog
+Implementation-Version: 0.0.1-SNAPSHOT
+Built-By: Administrator
+Specification-Title: otalog
+Implementation-Vendor-Id: com.ota
+Build-Jdk: 1.8.0_121
+Specification-Version: 0.0.1-SNAPSHOT
+Build-Version: 0.0.1-SNAPSHOT-2018-04-17T03:04:44Z
+Created-By: Maven Integration for Eclipse
+

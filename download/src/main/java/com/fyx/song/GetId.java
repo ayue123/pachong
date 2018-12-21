@@ -26,16 +26,16 @@ public class GetId {
                 Set<Integer> iii = new HashSet<Integer>();
                 while ((s = br.readLine()) != null) {
                         //截取
-                        //                        String[] outResult = s.split("\\*");
-                        //                        for (int i = 0; i < outResult.length; i++)
-                        //                                out.write(outResult[i] + "\n");
+                        String[] outResult = s.split("\\*");
+                        for (int i = 0; i < outResult.length; i++)
+                                out.write(outResult[i] + "\n");
                         //截取
-                        //                        try {
-                        //                                int i = Integer.parseInt(s);
-                        //                                out.write(s + "\n");
-                        //                        } catch (Exception e) {
-                        //
-                        //                        }
+                        try {
+                                int i = Integer.parseInt(s);
+                                out.write(s + "\n");
+                        } catch (Exception e) {
+
+                        }
                         //去重
                         iii.add(Integer.parseInt(s));
 
