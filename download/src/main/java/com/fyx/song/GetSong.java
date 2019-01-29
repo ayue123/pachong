@@ -30,7 +30,7 @@ import cn.edu.hfut.dmic.webcollector.util.FileUtils;
 public class GetSong extends BreadthCrawler {
         File downloadDir;
         static List<Integer> songIdList = new LinkedList<Integer>();
-        static Map<String, String> songIDNameMap = new HashMap<String, String>();
+        static Map<String, String> songIDNameMap = new HashMap<String, String>(2000);
         static List<String> songUrlList = new LinkedList<String>();
 
         /*用一个整数，不断自增，来作为下载的图片的文件名*/
@@ -78,7 +78,7 @@ public class GetSong extends BreadthCrawler {
                 List<String> authorList = new LinkedList<String>();
                 //将id附近的字符串替换为*
                 String a = "href\\=\"\\/song\\?id\\=";
-                String b = "\\*";
+                String b = "\\#";
                 String c = "\"\\>\\<b title\\=";
                 String d = "data-res-name\\=\"";
                 String e = "\" data-res-author=\"";
@@ -90,39 +90,66 @@ public class GetSong extends BreadthCrawler {
                         sssss = ssss.replaceAll(e, b);
                         ssssss = sssss.replaceAll(f, b);
                 }
-                //按*截取
-                String[] outResult = ssssss.split("\\*");
+                //按#截取
+                //注意事项：要将网页中的#字符删除干净，否则会导致截取错乱
+                String[] outResult = ssssss.split("\\#");
                 List<String> finalOutResult = new LinkedList<String>();
                 for (int i = 0; i < outResult.length; i++) {
                         try {
-                                if (outResult[i].length() <= 70) {
+                                //注意事项：有时歌曲名称或者作者名称过长导致排序错误
+                                if (outResult[i].length() <= 80) {
                                         finalOutResult.add(outResult[i]);
                                 }
                         } catch (Exception exception) {
 
                         }
                 }
+                //排错代码
+                //                for (int i = 0; i < finalOutResult.size(); i++) {
+                //
+                //                        if (i % 3 == 0) {
+                //                                out.write(finalOutResult.get(i) + "******************************" + "\n");
+                //                        } else {
+                //
+                //                                out.write(finalOutResult.get(i) + "\n");
+                //                        }
+                //                }
                 for (int i = 0; i < finalOutResult.size(); i++) {
                         //将id添加到idList中
                         if (i % 3 == 0) {
-                                int id = Integer.parseInt(finalOutResult.get(i));
-                                songIdList.add(id);
+                                try {
+                                        int id = Integer.parseInt(finalOutResult.get(i));
+                                        songIdList.add(id);
+                                } catch (Exception e2) {
+
+                                }
 
                         }
                         if (i % 3 == 1) {
                                 String name = finalOutResult.get(i);
-                                nameList.add(name);
+                                try {
+                                        String name2 = name.replaceAll("/", "");
+                                        nameList.add(name2);
+                                } catch (Exception e2) {
+                                        // TODO: handle exception
+                                }
                         }
                         if (i % 3 == 2) {
                                 String auther = finalOutResult.get(i);
-                                authorList.add(auther);
+                                try {
+
+                                        String auther2 = auther.replaceAll("/", "");
+                                        authorList.add(auther2);
+                                } catch (Exception e2) {
+                                        // TODO: handle exception
+                                }
                         }
                 }
 
                 //拼接url
                 for (int i = 0; i < songIdList.size(); i++) {
-                        String songUrl = "http://music.163.com/song/media/outer/url?id=" + songIdList.get(i) + ".mp3" + nameList.get(i) + "-" + authorList.get(i);
-                        out.write(songUrl + "\n");
+                        String songUrl = "http://music.163.com/song/media/outer/url?id=" + songIdList.get(i) + ".mp3";
+                        out.write(songUrl + nameList.get(i) + "-" + authorList.get(i) + "\n");
                         songIDNameMap.put(songUrl, nameList.get(i) + "--" + authorList.get(i));
 
                 }
@@ -154,6 +181,7 @@ public class GetSong extends BreadthCrawler {
 
                 //网易音乐
                 //通过歌单歌曲id拼接为url
+                //注意事项：有时
                 crawler.getSongIdList();
                 for (int songId : songIdList) {
                         //拼接下载路径
